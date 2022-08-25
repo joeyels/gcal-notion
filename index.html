@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Google Calendar API Quickstart</title>
+    <title></title>
     <meta charset="utf-8" />
   </head>
   <body>
-    <p>Google Calendar API Quickstart</p>
 
     <!--Add buttons to initiate auth sequence and sign out-->
     <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
     <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
+    <h1 id="currentDate"> </h1>
 
     <pre id="content" style="white-space: pre-wrap;"></pre>
 
@@ -109,11 +109,21 @@
         const token = gapi.client.getToken();
         if (token !== null) {
           google.accounts.oauth2.revoke(token.access_token);
-          gapi.client.setToken('');
+          //google.accounts.oauth2.revoke(token.access_token);
+          //gapi.client.setToken('');
           document.getElementById('content').innerText = '';
           document.getElementById('authorize_button').innerText = 'Authorize';
           document.getElementById('signout_button').style.visibility = 'hidden';
         }
+      }
+
+      function setToday() {
+        let date = new Date();
+        let day = date.getDate();
+        let month = date.getMonth() + 1;
+        let year = date.getFullYear();
+        let currentDate = `${month}-${day}-${year}`;
+        document.getElementById('currentDate').innerText = currentDate;
       }
 
       /**
@@ -129,7 +139,7 @@
             'timeMin': (new Date()).toISOString(),
             'showDeleted': false,
             'singleEvents': true,
-            'maxResults': 10,
+            'maxResults': 100,
             'orderBy': 'startTime',
           };
           response = await gapi.client.calendar.events.list(request);
@@ -144,6 +154,7 @@
           return;
         }
         // Flatten to string to display
+        setToday();
         const output = events.reduce(
             (str, event) => `${str}${event.summary} (${event.start.dateTime || event.start.date})\n`,
             'Events:\n');
